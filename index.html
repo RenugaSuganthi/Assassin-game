@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assassin Game</title>
+  
+<audio id="gameSound" preload="auto" loop >
+    <source src="assassin.mp3" type="audio/mp3">
+    Your browser does not support the audio element.
+  </audio>
+  
+  <style>
+    /* General Styling */
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: url(https://cdn.mos.cms.futurecdn.net/T3mNhKDaZeUKcLZxwq2raH.jpg);
+      background-repeat: no-repeat;
+      background-size: cover;
+      color: white;
+      overflow: hidden;
+    }
+
+    h1 {
+      font-size: 4rem;
+      text-align: center;
+      text-transform: uppercase;
+      margin-bottom: 50px;
+      animation: fadeIn 2s ease-in-out;
+      background: linear-gradient(to left, #992b27, #df6a0b);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    /* Button Styling */
+    .button {
+      display: inline-block;
+      padding: 15px 40px;
+      margin: 15px;
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: white;
+      text-transform: uppercase;
+      background: #ff6f61;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(255, 111, 97, 0.5);
+    }
+
+    .button:hover {
+      transform: scale(1.1);
+      background: #ff8364;
+      box-shadow: 0 10px 20px rgba(255, 131, 100, 0.7);
+    }
+
+    .button:focus {
+      outline: 2px solid white;
+      outline-offset: 4px;
+    }
+
+    /* Modal Styling */
+    .modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80%;
+      max-width: 500px;
+      background: white;
+      color: black;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      display: none;
+      animation: slideDown 0.5s ease-out forwards;
+    }
+
+    .modal h2 {
+      margin-bottom: 15px;
+      font-size: 1.8rem;
+      color: #ff6f61;
+    }
+
+    .modal p {
+      font-size: 1.2rem;
+      line-height: 1.5;
+    }
+
+    .modal .close {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 1.5rem;
+      color: #ff6f61;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .modal .close:hover {
+      transform: scale(1.2);
+    }
+
+    /* Keyframes for Animation */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideDown {
+      from {
+        transform: translate(-50%, -60%);
+        opacity: 0;
+      }
+      to {
+        transform: translate(-50%, -50%);
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <h1>Assassin Game</h1>
+    <button class="button" id="newGameButton">New Game</button>
+    <button class="button" id="settingsButton">Settings</button>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal" id="settingsModal">
+    <span class="close" id="closeModal">&times;</span>
+    <h2>Settings</h2>
+    <p><strong>How to Play:</strong> Use the arrow keys to move, avoid obstacles, and collect points!</p>
+    <p>
+      <strong>Sound Effect:</strong> 
+      <button class="button" id="soundToggle">Turn On</button>
+    </p>
+  </div>
+
+  <script>
+    // JavaScript for Modal and Sound Toggle
+    const settingsButton = document.getElementById('settingsButton');
+    const newGameButton = document.getElementById('newGameButton');
+    const settingsModal = document.getElementById('settingsModal');
+    const closeModal = document.getElementById('closeModal');
+    const soundToggle = document.getElementById('soundToggle');
+    const gameSound = document.getElementById('gameSound');
+
+    // Redirect to pr1.html for New Game
+    newGameButton.addEventListener('click', () => {
+      window.location.href = 'pr3.html'; // Change 'pr3.html' to your desired game page
+    });
+
+    // Show Settings Modal
+    settingsButton.addEventListener('click', () => {
+      settingsModal.style.display = 'block';
+    });
+
+    // Close Modal
+    closeModal.addEventListener('click', () => {
+      settingsModal.style.display = 'none';
+    });
+
+    // Toggle Sound
+    let soundOn = false;
+    soundToggle.addEventListener('click', () => {
+      soundOn = !soundOn;
+      if (soundOn) {
+        gameSound.muted = false;
+        gameSound.play();
+      } else {
+        gameSound.muted = true;
+        gameSound.pause();
+        gameSound.currentTime = 0;
+      }
+      soundToggle.textContent = soundOn ? 'Turn Off' : 'Turn On';
+    });
+
+    // Close Modal if clicked outside
+    window.addEventListener('click', (event) => {
+      if (event.target === settingsModal) {
+        settingsModal.style.display = 'none';
+      }
+    });
+
+    // Close Modal with Escape Key
+    window.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        settingsModal.style.display = 'none';
+      }
+    });
+
+    // Error Handling for Audio
+    gameSound.onerror = () => {
+      alert('Audio file failed to load. Please check the file path.');
+    };
+  </script>
+</body>
+</html>

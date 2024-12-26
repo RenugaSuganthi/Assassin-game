@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hunter Assassin Game</title>
+    <audio id="attackSound" src="attackSound.mp3"></audio>
+    <audio id="gameOverSound" src="gameOverSound.mp3"></audio>
+    <style>
+        
+        body {
+            background: url('w6.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            box-shadow: inset 0 0 150px rgba(0, 0, 0, 0.5);
+        }
+        
+
+        #gameArea {
+            position: relative;
+            top: 30px;
+            left: -100px;
+            width: 1900px;
+            height: 430px; 
+            background-color: transparent;
+            border-radius: 25px;
+            padding: 0%;
+            margin: 0%;
+        }
+
+
+        #player {
+            position: absolute;
+            width: 80px;
+            height: 60px;
+            background: url("vi.PNG");
+            background-size: contain;
+            background-repeat: no-repeat;
+            z-index: 5;
+            margin-left: -15px;
+            margin-top:-20px;
+            
+        }
+
+        #attackRange {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background-color: rgba(231, 76, 60, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+            animation: glowEffect 1s infinite alternate;
+        }
+        @keyframes glowEffect {
+            0% {
+                box-shadow: 0 0 10px rgb(215, 231, 71);
+            }
+            100% {
+                box-shadow: 0 0 20px rgb(249, 253, 0);
+            }
+        }
+
+        .enemy {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: url("pr2.png");
+            background-size: contain;
+            border-radius: 50%;
+            background-repeat: no-repeat;
+        }
+
+        .enemy-torch {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 60px solid transparent;
+            border-right: 60px solid transparent;
+            border-bottom: 100px solid rgba(255, 255, 200, 0.4);
+            pointer-events: none;
+            transform-origin: center top;
+            z-index: 1;
+        }
+        
+        .obstacle {
+            position: absolute;
+            width: 150px;
+            height: 60px;
+            background: url("brick.png");
+            background-size:cover;
+            background-repeat: no-repeat;
+            border-radius: 5px;
+            
+        }
+
+        #scoreDisplay {
+            position: absolute;
+            top: 45px;
+            left: 10px;
+            
+            font-size: 25px;
+            z-index: 3;
+        }
+
+        #levelDisplay {
+            position: absolute;
+            top: 80px;
+            left: 10px;
+            
+            font-size: 25px;
+            z-index: 3;
+        }
+
+        #healthDisplay {
+            left: 10px;
+            position: absolute;
+            top: 10px;
+            
+            font-size: 25px;
+            z-index: 3;
+        }
+
+        #hed {
+            left: 38%;
+            position: absolute;
+            top: 10px;
+            color: transparent;
+            font-size: 25px;
+            z-index: 3;
+            animation: effect 2s linear infinite;
+            
+        }
+        @keyframes effect {
+            0% {
+                background: linear-gradient(135deg,#ff7b00, #99d1ff);
+                -webkit-background-clip: text;
+            }
+ 
+            100% {
+                background: linear-gradient(135deg,#e7770f, #0da188);
+                -webkit-background-clip: text;
+            }
+        }
+
+        #gameOver {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: rgb(224, 127, 81);
+            font-size: 40px;
+            font-weight: 700;
+            display: none;
+        }
+
+        #board {
+            position: relative;
+            top: -250px;
+            left: 1150px;
+            width: 250px;
+            height: 120px;
+            color:#b35f00;
+            overflow: hidden;
+            background-color: transparent;
+            border-radius: 20px;
+            font-family:Arial, Helvetica, sans-serif;
+            font-weight: 700;
+        }
+
+        #playagain {
+        position: absolute;
+        top: 60%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: 10px 20px;
+        font-size: 18px;
+        background-color: #be6007;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        display: none;
+        transition: all 0.3s ease;
+    }
+
+    #playagain:hover {
+        background-color: #00adb3;
+        transform: scale(0,1.1);
+    }
+
+    @keyframes flashEffect {
+    0% {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1);
+    }
+}
+
+.flash {
+    animation: flashEffect 0.5s ease-in-out;
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background-color: rgba(231, 76, 60, 0.8);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+
+
+
+    </style>
+</head>
+<body>
+    <div id="board">
+        <div id="scoreDisplay">Score: 0</div>
+        <div id="healthDisplay">Health: 100</div>
+        <div id="levelDisplay">Level: 1</div>
+    </div>
+    <div id="hed"><h1>Assassin Game</h1></div>
+    <div id="gameArea">
+        <div id="player"></div>
+        <div id="attackRange"></div>
+        <div class="obstacle" style="top: 50px; left: 200px;"></div>
+        <div class="obstacle" style="top: 150px; left: 400px;"></div>
+        <div class="obstacle" style="top: 300px; left: 100px;"></div>
+    
+    </div>
+    
+    <div id="gameOver">Game Over!</div>
+    <div id="gamescore">Score: 0</div>
+    <button id="playagain">Play Again</button>
+    
+    <script>
+        const player = document.getElementById('player');
+        const attackRange = document.getElementById('attackRange');
+        const gameArea = document.getElementById('gameArea');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const healthDisplay = document.getElementById('healthDisplay');
+        const gameOverDisplay = document.getElementById('gameOver');
+        const gamescoreDisplay = document.getElementById('gamescore');
+        const playagainDisplay = document.getElementById('playagain');
+        const obstacles = document.querySelectorAll('.obstacle');
+        const board = document.getElementById('board');
+
+        let playerPosition = { x: 0, y: 0 };
+        let playerHealth = 100;
+        const step = 10;
+        const attackRangeRadius = 50;
+        let enemies = [];
+        let score = 0;
+        let level = 1;
+
+        function generateEnemies() {
+            enemies.forEach(enemy => enemy.enemy.remove());
+            enemies = [];
+
+            for (let i = 0; i < level; i++) {
+                const enemy = document.createElement('div');
+                enemy.classList.add('enemy');
+                enemy.style.left = `${Math.random() * (gameArea.clientWidth - 30)}px`;
+                enemy.style.top = `${Math.random() * (gameArea.clientHeight - 30)}px`;
+
+                const torch = document.createElement('div');
+                torch.classList.add('enemy-torch');
+                enemy.appendChild(torch);
+
+                gameArea.appendChild(enemy);
+                enemies.push({ enemy, torch, chasing: false });
+                patrolEnemy(enemy, torch);
+            }
+        }
+
+        function patrolEnemy(enemy, torch) {
+            const directions = ['left', 'right', 'up', 'down'];
+            let direction = directions[Math.floor(Math.random() * directions.length)];
+            const speed = 2;
+
+            const patrolInterval = setInterval(() => {
+                const enemyPos = {
+                    x: parseInt(enemy.style.left),
+                    y: parseInt(enemy.style.top),
+                };
+
+                if (direction === 'left' && enemyPos.x > 0 && !checkForObstacle(enemy, 'left')) {
+                    enemy.style.left = `${enemyPos.x - speed}px`;
+                    torch.style.transform = 'rotate(90deg)';
+                    torch.style.left = '-60px';
+                    torch.style.top = '15px';
+                } else if (direction === 'right' && enemyPos.x < gameArea.clientWidth - 30 && !checkForObstacle(enemy, 'right')) {
+                    enemy.style.left = `${enemyPos.x + speed}px`;
+                    torch.style.transform = 'rotate(-90deg)';
+                    torch.style.left = '-30px';
+                    torch.style.top = '15px';
+                } else if (direction === 'up' && enemyPos.y > 0 && !checkForObstacle(enemy, 'up')) {
+                    enemy.style.top = `${enemyPos.y - speed}px`;
+                    torch.style.transform = 'rotate(180deg)';
+                    torch.style.left = '-45px';
+                    torch.style.top = '0px';
+                } else if (direction === 'down' && enemyPos.y < gameArea.clientHeight - 30 && !checkForObstacle(enemy, 'down')) {
+                    enemy.style.top = `${enemyPos.y + speed}px`;
+                    torch.style.transform = 'rotate(0deg)';
+                    torch.style.left = '-45px';
+                    torch.style.top = '30px';
+                } else {
+                    direction = directions[Math.floor(Math.random() * directions.length)];
+                }
+            }, 20);
+
+            enemy.dataset.interval = patrolInterval;
+        }
+
+        
+
+        function chasePlayer(enemy, torch) {
+            const enemyPos = {
+                x: parseInt(enemy.style.left),
+                y: parseInt(enemy.style.top),
+            };
+            const playerPos = {
+                x: playerPosition.x + 15,
+                y: playerPosition.y + 15,
+            };
+            const distance = Math.sqrt(Math.pow(playerPos.x - enemyPos.x, 2) + Math.pow(playerPos.y - enemyPos.y, 2));
+
+            if (distance < attackRangeRadius) {
+                enemy.style.left = `${enemyPos.x + (playerPos.x - enemyPos.x) / 10}px`;
+                enemy.style.top = `${enemyPos.y + (playerPos.y - enemyPos.y) / 10}px`;
+
+                // Simulate an attack after 3 seconds of chase
+                setTimeout(() => {
+                    if (distance < attackRangeRadius) {
+                        playerHealth -= 5;
+                        healthDisplay.textContent = `Health: ${playerHealth}`;
+                        if (playerHealth <= 0) {
+                            gameOver();
+                        }
+                    }
+                }, 3000);
+            }
+        }
+
+        function gameOver() {
+            gameOverDisplay.style.display = 'block';
+            playagainDisplay.style.display = 'block';
+            gamescoreDisplay.textContent = `Score: ${score}`;
+            gameArea.style.display = 'none';
+            board.style.display = 'none';
+            enemies.forEach(({ enemy }) => {
+                clearInterval(enemy.dataset.interval);
+                enemy.remove();
+            });
+            document.getElementById('gameOverSound').play();  // Play game over sound
+        }
+
+        function checkForObstacle(object, direction) {
+    const objectRect = object.getBoundingClientRect();
+    for (let obstacle of obstacles) {
+        const obstacleRect = obstacle.getBoundingClientRect();
+        if (direction === 'left' &&
+            objectRect.x - 2 < obstacleRect.x + obstacleRect.width &&
+            objectRect.x > obstacleRect.x &&
+            objectRect.y + objectRect.height > obstacleRect.y &&
+            objectRect.y < obstacleRect.y + obstacleRect.height) {
+            return true;
+        }
+        if (direction === 'right' &&
+            objectRect.x + objectRect.width + 2 > obstacleRect.x &&
+            objectRect.x + objectRect.width < obstacleRect.x + obstacleRect.width &&
+            objectRect.y + objectRect.height > obstacleRect.y &&
+            objectRect.y < obstacleRect.y + obstacleRect.height) {
+            return true;
+        }
+        if (direction === 'up' &&
+            objectRect.y - 2 < obstacleRect.y + obstacleRect.height &&
+            objectRect.y > obstacleRect.y &&
+            objectRect.x + objectRect.width > obstacleRect.x &&
+            objectRect.x < obstacleRect.x + obstacleRect.width) {
+            return true;
+        }
+        if (direction === 'down' &&
+            objectRect.y + objectRect.height + 2 > obstacleRect.y &&
+            objectRect.y + objectRect.height < obstacleRect.y + obstacleRect.height &&
+            objectRect.x + objectRect.width > obstacleRect.x &&
+            objectRect.x < obstacleRect.x + obstacleRect.width) {
+            return true;
+        }
+    }
+    return false;
+}
+
+document.addEventListener('keydown', (event) => {
+    let moved = false;
+
+    switch (event.key) {
+        case 'ArrowUp':
+            if (playerPosition.y > 0 && !checkForObstacle(player, 'up')) {
+                playerPosition.y -= step;
+                moved = true;
+            }
+            break;
+        case 'ArrowDown':
+            if (playerPosition.y < gameArea.clientHeight - 30 && !checkForObstacle(player, 'down')) {
+                playerPosition.y += step;
+                moved = true;
+            }
+            break;
+        case 'ArrowLeft':
+            if (playerPosition.x > 0 && !checkForObstacle(player, 'left')) {
+                playerPosition.x -= step;
+                moved = true;
+            }
+            break;
+        case 'ArrowRight':
+            if (playerPosition.x < gameArea.clientWidth - 30 && !checkForObstacle(player, 'right')) {
+                playerPosition.x += step;
+                moved = true;
+            }
+            break;
+        case ' ':
+            attackEnemies();
+            break;
+    }
+
+    if (moved) {
+        updatePositions();
+    }
+});
+
+
+
+        function updatePositions() {
+            player.style.transform = `translate(${playerPosition.x}px, ${playerPosition.y}px)`;
+            attackRange.style.transform = `translate(${playerPosition.x - 35}px, ${playerPosition.y - 35}px)`;
+            enemies.forEach(({ enemy, torch }) => {
+                chasePlayer(enemy, torch);
+            });
+        }
+
+        function attackEnemies() {
+            enemies.forEach(({ enemy }, index) => {
+                const enemyRect = enemy.getBoundingClientRect();
+                const playerRect = player.getBoundingClientRect();
+                const distance = Math.sqrt(
+                    Math.pow(playerRect.x + 15 - (enemyRect.x + 15), 2) +
+                    Math.pow(playerRect.y + 15 - (enemyRect.y + 15), 2)
+                );
+                if (distance < attackRangeRadius) {
+                    // Create flash effect
+                    const flash = document.createElement('div');
+                    flash.classList.add('flash');
+                    flash.style.left = `${enemyRect.left + enemyRect.width / 2 - 50}px`;
+                    flash.style.top = `${enemyRect.top + enemyRect.height / 2 - 50}px`;
+                    gameArea.appendChild(flash);
+
+                    // Remove enemy
+                    enemy.remove();
+                    enemies.splice(index, 1);
+                    score += 10;
+                    scoreDisplay.textContent = `Score: ${score}`;
+                    document.getElementById('attackSound').play();  // Play attack sound
+
+                    // Remove flash after animation
+                    setTimeout(() => flash.remove(), 500);
+
+                    if (enemies.length === 0) {
+                        level++;
+                        levelDisplay.textContent = `Level: ${level}`;
+                        generateEnemies();
+                    }
+                }
+            });
+        }
+
+
+    
+    
+
+    // Update Enemy Movement
+    function isInTorchlight(enemy) {
+            const enemyRect = enemy.getBoundingClientRect();
+            const playerRect = player.getBoundingClientRect();
+
+            const enemyCenterX = enemyRect.left + enemyRect.width / 2;
+            const enemyCenterY = enemyRect.top + enemyRect.height / 2;
+            const playerCenterX = playerRect.left + playerRect.width / 2;
+            const playerCenterY = playerRect.top + playerRect.height / 2;
+
+ const torchlightDirection = { x: 0, y: 1 };
+            const dx = playerCenterX - enemyCenterX;
+            const dy = playerCenterY - enemyCenterY;
+
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const playerDirection = { x: dx / distance, y: dy / distance };
+
+            const dotProduct = playerDirection.x * torchlightDirection.x + playerDirection.y * torchlightDirection.y;
+            const angle = Math.acos(dotProduct) * (180 / Math.PI);
+
+            return angle < 100 && distance < 100; // Adjusted angle threshold
+        }
+
+        function updateEnemies() {
+            enemies.forEach((enemy) => {
+                if (isInTorchlight(enemy.enemy) && !healthCooldown) {
+                    playerHealth -= 3;
+                    healthDisplay.textContent = `Health: ${playerHealth}`;
+                    healthCooldown = true; // Set cooldown to true
+                    setTimeout(() => {
+                        healthCooldown = false; // Reset cooldown after 1000ms (1 second)
+                    }, 1000); // Adjust the cooldown duration as needed
+                }
+            });
+        }
+
+        function startGame() {
+            generateEnemies();
+            updatePositions();
+            gameLoop = setInterval(() => {
+                updateEnemies(); // Call the updateEnemies function to check for health decrease
+            }, 100); // Adjust the interval as needed
+        }
+
+        playagainDisplay.addEventListener('click', () => {
+            playerHealth = 100;
+            healthDisplay.textContent = `Health: ${playerHealth}`;
+            score = 0;
+            scoreDisplay.textContent = `Score: ${score}`;
+            level = 1;
+            levelDisplay.textContent = `Level: ${level}`;
+            gameOverDisplay.style.display = 'none';
+            playagainDisplay.style.display = 'none'; // Hide the Play Again button
+            gameArea.style.display = 'block'; // Show the game area
+            window.location.href = 'pr3.html'; // Restart the game
+        });
+
+        startGame();
+    </script>
+</body>
+</html>
